@@ -15,8 +15,8 @@ gpgcheck=0
 
 EOM
 
-yum install centos-release-openstack-kilo
-yum install yum-utils &&  yum-config-manager --enable  centos-openstack-kilo-test &&  yum install openstack-packstack && packstack --allinone
+yum -y install centos-release-openstack-kilo
+yum -y install yum-utils  &&  yum -y install openstack-packstack && packstack --allinone
 if [ $? -eq 0 ]; then 
   echo 'Pass!'
 else
