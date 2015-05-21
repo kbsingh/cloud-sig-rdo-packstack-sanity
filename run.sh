@@ -17,9 +17,3 @@ EOM
 
 yum -y install centos-release-openstack-kilo
 yum -y install yum-utils  &&  yum -y install openstack-packstack && packstack --allinone
-if [ $? -eq 0 ]; then 
-  echo 'Pass!'
-else
-  echo 'Fail.'
-  exit 1
-fi
