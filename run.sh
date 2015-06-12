@@ -15,5 +15,9 @@ gpgcheck=0
 
 EOM
 
+echo ' --- this test will run with the following rpm content in repos'
+yum list
+echo ' --- '
+
 yum -y install centos-release-openstack-kilo
 yum -y install yum-utils  &&  yum -y install openstack-packstack && packstack --allinone
