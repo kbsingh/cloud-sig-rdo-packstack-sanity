@@ -1,23 +1,19 @@
 #!/bin/bash
 
-cat > /etc/yum.repos.d/rdo-buildsys.repo<<- EOM
-[cloud7-openstack-kilo-testing]
-name=cloud7-openstack-kilo-testing
-baseurl=http://cbs.centos.org/repos/cloud7-openstack-kilo-testing/x86_64/os/
-enabled=1
-gpgcheck=0
-
-[cloud7-openstack-common-testing]
-name=cloud7-openstack-common-testing
-baseurl=http://cbs.centos.org/repos/cloud7-openstack-common-testing/x86_64/os/
-enabled=1
-gpgcheck=0
-
-EOM
-
-echo ' --- this test will run with the following rpm content in repos'
+yum -y install centos-release-openstack-liberty
 yum list
-echo ' --- '
-
-yum -y install centos-release-openstack-kilo
 yum -y install yum-utils  &&  yum -y install openstack-packstack && packstack --allinone
+if [ $? -ne 0 ]; then
+  echo 'packstack is now in a happy state'
+  exit 1
+fi
+
+. ~/keystonerc_admin
+curl -O http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+glance image-create --name='CentOS7' --container-format=bare --disk-format=qcow2 < CentOS-7-x86_64-GenericCloud.qcow2 
+nova secgroup-create gen_sg "generic :22 and icmp"
+nova secgroup-add-rule gen_sg icmp 0 255 0.0.0.0/0
+nova secgroup-add-rule gen_sg tcp 22 22 0.0.0.0/0
+nova keypaid-add --pub-key ~/.ssh/id_rsa.pub gen_kp
+nova boot --image="CentOS7" --flavor="m1.small" --key_name gen_kp --security-groups gen_sg i1
+
